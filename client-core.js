@@ -14,16 +14,18 @@ function execute() {
     const args = process.argv;
     let message = {};
     switch (args[2]) {
-        case 'list':
+        case 'list': {
             message = parseMessage(args);
             let answer = newRequest(createQuery(message, 'get'), 'get');
 
             return Promise.resolve(answer);
-        case 'send':
+        }
+        case 'send': {
             message = parseMessage(args);
             let requestMessage = newRequest(createQuery(message, 'post'), 'post');
 
             return Promise.resolve(requestMessage);
+        }
         default:
             break;
     }
