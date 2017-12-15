@@ -6,12 +6,11 @@ module.exports.isStar = true;
 const request = require('request');
 const url = 'http://localhost:8080/messages';
 const chalk = require('chalk');
-const red = chalk.hex('#f00');
-const green = chalk.hex('#0f0');
+const red = chalk.hex('#F00');
+const green = chalk.hex('#0F0');
 
 function execute() {
     // Внутри этой функции нужно получить и обработать аргументы командной строки
-    const args = process.argv;
     let message = {};
     switch (args[2]) {
         case 'list': {
@@ -34,7 +33,7 @@ function execute() {
 function parseMessage(args) {
     let message = {};
     for (let i = 3; i < args.length; i++) {
-        let arg = args[i].match(/[^-].*/);
+    let arg = args[i].match(/[^-].*/);
         if (arg[0].indexOf('=') !== -1) {
             let splitArg = arg[0].split('=');
             message[splitArg[0]] = splitArg[1];
@@ -56,7 +55,9 @@ function createQuery(message, method) {
     if (keysMessage.length) {
         urlQuery += '?';
         keysMessage.forEach(item => {
-            urlQuery += item + '=' + message[item] + '&';
+            if (item !== 'text') {
+                urlQuery += item + '=' + message[item] + '&';
+            }
         });
         urlQuery = urlQuery.slice(0, -1);
     }
@@ -99,13 +100,13 @@ function formRequest(requestMessage, method) {
     }
     let finish = '';
     if (requestMessage && requestMessage.from) {
-        finish += red('FROM') + ': ' + requestMessage.from + '\n';
+        finish += chalk.hex('#F00')('FROM') + ': ' + requestMessage.from + '\n';
     }
     if (requestMessage && requestMessage.to) {
-        finish += red('TO') + ': ' + requestMessage.to + '\n';
+        finish += chalk.hex('#F00')('TO') + ': ' + requestMessage.to + '\n';
     }
     if (requestMessage && requestMessage.text) {
-        finish += green('TEXT') + ': ' + requestMessage.text;
+        finish += chalk.hex('#0F0')('TEXT') + ': ' + requestMessage.text;
     }
 
     return finish;
