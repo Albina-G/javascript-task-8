@@ -57,7 +57,7 @@ function createAnswerGet(query) {
         return JSON.stringify(allMessages);
     }
 
-    return JSON.stringify(allMessages.filter(message => {
+    return JSON.stringify(allMessages.filter((message) => {
         if (query.from === undefined) {
 
             return message.to === query.to;

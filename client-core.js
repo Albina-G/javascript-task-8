@@ -82,7 +82,7 @@ function newRequest(query, method) {
             return resolve(body);
         });
     })
-        .then(message => formRequest(message, method));
+        .then((message) => formRequest(message, method));
 }
 
 function formRequest(requestMessage, method) {
