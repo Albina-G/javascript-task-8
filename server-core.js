@@ -53,16 +53,16 @@ function createAnswerPost(query, text) {
 }
 
 function createAnswerGet(query) {
-    if (!query.from && !query.to) {
+    if (query.from === undefined && query.to === undefined) {
         return JSON.stringify(allMessages);
     }
 
     return JSON.stringify(allMessages.filter(message => {
-        if (!query.from) {
+        if (query.from === undefined) {
 
             return message.to === query.to;
         }
-        if (!query.to) {
+        if (query.to === undefined) {
 
             return message.from === query.from;
         }
