@@ -6,12 +6,14 @@ module.exports.isStar = true;
 const request = require('request');
 const url = 'http://localhost:8080/messages';
 const chalk = require('chalk');
+const red = chalk.hex('#F00');
+const green = chalk.hex('#0F0');
 
 function execute() {
     // Внутри этой функции нужно получить и обработать аргументы командной строки
     const args = process.argv;
     let message = {};
-    switch (args[2]) {
+    switch (args[2].toLowerCase()) {
         case 'list': {
             message = parseMessage(args);
             let answer = newRequest(createQuery(message, 'get'), 'get');
@@ -35,9 +37,9 @@ function parseMessage(args) {
         let arg = args[i].match(/[^-].*/);
         if (arg[0].indexOf('=') !== -1) {
             let splitArg = arg[0].split('=');
-            message[splitArg[0]] = splitArg[1];
+            message[splitArg[0].toLowerCase()] = splitArg[1];
         } else {
-            message[arg[0]] = args[i + 1];
+            message[arg[0].toLowerCase()] = args[i + 1];
             i++;
         }
     }
@@ -49,16 +51,12 @@ function createQuery(message, method) {
     if (!message.text && method === 'post') {
         return;
     }
-    let urlQuery = url;
-    let keysMessage = Object.keys(message);
-    if (keysMessage.length) {
-        urlQuery += '?';
-        keysMessage.forEach(item => {
-            if (item !== 'text') {
-                urlQuery += item + '=' + message[item] + '&';
-            }
-        });
-        urlQuery = urlQuery.slice(0, -1);
+    let urlQuery = url + '?';
+    if (message.from) {
+        urlQuery += 'from=' + message.from + '&';
+    }
+    if (message.to) {
+        urlQuery += 'to=' + message.to;
     }
     const query = {
         method: method,
@@ -74,7 +72,7 @@ function createQuery(message, method) {
 
 function newRequest(query, method) {
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         request(query, function (err, res, body) {
             if (err) {
 
@@ -99,13 +97,13 @@ function formRequest(requestMessage, method) {
     }
     let finish = '';
     if (requestMessage && requestMessage.from) {
-        finish += chalk.hex('#F00')('FROM') + ': ' + requestMessage.from + '\n';
+        finish += red('FROM') + ': ' + requestMessage.from + '\n';
     }
     if (requestMessage && requestMessage.to) {
-        finish += chalk.hex('#F00')('TO') + ': ' + requestMessage.to + '\n';
+        finish += red('TO') + ': ' + requestMessage.to + '\n';
     }
     if (requestMessage && requestMessage.text) {
-        finish += chalk.hex('#0F0')('TEXT') + ': ' + requestMessage.text;
+        finish += green('TEXT') + ': ' + requestMessage.text;
     }
 
     return finish;
