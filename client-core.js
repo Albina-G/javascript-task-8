@@ -72,7 +72,7 @@ function createQuery(message, method) {
 
 function newRequest(query, method) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         request(query, function (err, res, body) {
             if (err) {
 
