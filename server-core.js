@@ -9,6 +9,7 @@ let allMessages = [];
 server.on('request', (req, res) => {
     let parseUrl = url.parse(req.url, true);
     if (/^\/messages$/.test(parseUrl.pathname)) {
+        res.setHeader('Content-Type', 'application/json');
         let textMessage = '';
         switch (req.method) {
             case 'GET':
@@ -41,11 +42,11 @@ server.on('request', (req, res) => {
 module.exports = server;
 
 function createAnswerPost(query, text) {
-    let answer = {};
-    Object.keys(query).forEach(key => {
-        answer[key] = query[key];
-    });
-    answer.text = text;
+    let answer = {
+        from: query.from || undefined,
+        to: query.to || undefined,
+        text: text
+    };
     allMessages.push(answer);
 
     return answer;

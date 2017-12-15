@@ -88,6 +88,10 @@ function newRequest(query, method) {
 }
 
 function formRequest(requestMessage, method) {
+    if (!requestMessage) {
+
+        return '';
+    }
     if (method === 'get') {
         let finishGet = '';
         for (let index = 0; index < requestMessage.length - 1; index++) {
@@ -98,13 +102,13 @@ function formRequest(requestMessage, method) {
         return finishGet;
     }
     let finish = '';
-    if (requestMessage.hasOwnProperty('from')) {
+    if (requestMessage.from) {
         finish += red('FROM') + ': ' + requestMessage.from + '\n';
     }
-    if (requestMessage.hasOwnProperty('to')) {
+    if (requestMessage.to) {
         finish += red('TO') + ': ' + requestMessage.to + '\n';
     }
-    if (requestMessage.hasOwnProperty('text')) {
+    if (requestMessage.text) {
         finish += green('TEXT') + ': ' + requestMessage.text;
     }
 
