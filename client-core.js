@@ -6,11 +6,10 @@ module.exports.isStar = true;
 const request = require('request');
 const url = 'http://localhost:8080/messages';
 const chalk = require('chalk');
-const red = chalk.hex('#F00');
-const green = chalk.hex('#0F0');
 
 function execute() {
     // Внутри этой функции нужно получить и обработать аргументы командной строки
+    const args = process.argv;
     let message = {};
     switch (args[2]) {
         case 'list': {
