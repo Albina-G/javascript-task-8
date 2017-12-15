@@ -32,7 +32,7 @@ function execute() {
 function parseMessage(args) {
     let message = {};
     for (let i = 3; i < args.length; i++) {
-    let arg = args[i].match(/[^-].*/);
+        let arg = args[i].match(/[^-].*/);
         if (arg[0].indexOf('=') !== -1) {
             let splitArg = arg[0].split('=');
             message[splitArg[0]] = splitArg[1];
