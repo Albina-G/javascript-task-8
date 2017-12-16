@@ -24,22 +24,19 @@ server.on('request', (req, res) => {
                 })
                     .on('end', () => {
                         textMessage = JSON.parse(textMessage);
-                        if (textMessage.text === undefined || textMessage.text === '') {
-                            res.statusCode = 404;
-                            res.end();
+                        if (!textMessage.text || textMessage.text === '') {
+                            errorReturn(res);
                         }
                         textMessage = createAnswerPost(parseUrl.query, textMessage.text);
                         res.end(JSON.stringify(textMessage));
                     });
                 break;
             default:
-                res.statusCode = 404;
-                res.end();
+                errorReturn(res);
                 break;
         }
     } else {
-        res.statusCode = 404;
-        res.end();
+        errorReturn(res);
     }
 });
 
@@ -74,4 +71,9 @@ function createAnswerGet(query) {
 
         return message.from === query.from && message.to === query.to;
     }));
+}
+
+function errorReturn(res) {
+    res.statusCode = 404;
+    res.end();
 }

@@ -15,13 +15,13 @@ function execute() {
     switch (args[2].toLowerCase()) {
         case 'list': {
             let message = parseMessage(args);
-            let answer = newRequest(createQuery(message, 'get'), isGet);
+            let answer = createQuery(message, 'GET');
 
             return Promise.resolve(answer);
         }
         case 'send': {
             let message = parseMessage(args);
-            let requestMessage = newRequest(createQuery(message, 'post'));
+            let requestMessage = createQuery(message, 'POST');
 
             return Promise.resolve(requestMessage);
         }
@@ -34,7 +34,7 @@ function parseMessage(args) {
     let message = {};
     for (let i = 3; i < args.length; i++) {
         let arg = args[i].match(/[^-].*/);
-        if (arg[0].includes('=') !== -1) {
+        if (arg[0].includes('=')) {
             let splitArg = arg[0].split('=');
             message[splitArg[0].toLowerCase()] = splitArg[1];
         } else {
@@ -47,29 +47,33 @@ function parseMessage(args) {
 }
 
 function createQuery(message, method) {
-    if (!message.text && method === 'post') {
-
-        return;
+    if (!message.text && method === 'POST') {
+        throw new Error('Отсутствует текст сообщения');
     }
     const query = {
         method: method,
         url: createUrl(message),
         json: true
     };
-    if (method === 'post') {
+    if (method === 'POST') {
         query.body = { text: message.text };
+
+        return newRequest(query);
     }
 
-    return query;
+    return newRequest(query, isGet);
 }
 
 function createUrl(message) {
     let urlQuery = url;
-    if (message.from || message.from) {
+    if (message.from || message.to) {
         urlQuery += '?';
     }
-    if (message.from) {
+    if (message.from && message.to) {
         urlQuery += `from=${message.from}&`;
+    }
+    if (message.from && !message.to) {
+        urlQuery += `from=${message.from}`;
     }
     if (message.to) {
         urlQuery += `to=${message.to}`;
