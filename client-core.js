@@ -4,7 +4,7 @@ const request = require('request');
 const chalk = require('chalk');
 const red = chalk.hex('#F00');
 const green = chalk.hex('#0F0');
-const url = 'http://localhost:8080/messages?';
+const url = 'http://localhost:8080/messages';
 
 module.exports.execute = execute;
 module.exports.isStar = true;
@@ -51,16 +51,9 @@ function createQuery(message, method) {
 
         return;
     }
-    let urlQuery = url;
-    if (message.from) {
-        urlQuery += `from=${message.from}&`;
-    }
-    if (message.to) {
-        urlQuery += `to=${message.to}`;
-    }
     const query = {
         method: method,
-        url: urlQuery,
+        url: createUrl(message),
         json: true
     };
     if (method === 'post') {
@@ -68,6 +61,21 @@ function createQuery(message, method) {
     }
 
     return query;
+}
+
+function createUrl(message) {
+    let urlQuery = url;
+    if (message.from || message.from) {
+        urlQuery += '?';
+    }
+    if (message.from) {
+        urlQuery += `from=${message.from}&`;
+    }
+    if (message.to) {
+        urlQuery += `to=${message.to}`;
+    }
+
+    return urlQuery;
 }
 
 function newRequest(query, responseProcessing = formRequest) {
