@@ -4,7 +4,7 @@ const request = require('request');
 const chalk = require('chalk');
 const red = chalk.hex('#F00');
 const green = chalk.hex('#0F0');
-const url = 'http://localhost:8080/messages';
+const url = 'http://localhost:8080/messages?';
 
 module.exports.execute = execute;
 module.exports.isStar = true;
@@ -15,13 +15,13 @@ function execute() {
     switch (args[2].toLowerCase()) {
         case 'list': {
             let message = parseMessage(args);
-            let answer = newRequest(createQuery(message, 'get'), 'get');
+            let answer = newRequest(createQuery(message, 'get'), isGet);
 
             return Promise.resolve(answer);
         }
         case 'send': {
             let message = parseMessage(args);
-            let requestMessage = newRequest(createQuery(message, 'post'), 'post');
+            let requestMessage = newRequest(createQuery(message, 'post'));
 
             return Promise.resolve(requestMessage);
         }
@@ -48,9 +48,10 @@ function parseMessage(args) {
 
 function createQuery(message, method) {
     if (!message.text && method === 'post') {
+
         return;
     }
-    let urlQuery = url + '?';
+    let urlQuery = url;
     if (message.from) {
         urlQuery += `from=${message.from}&`;
     }
@@ -69,31 +70,22 @@ function createQuery(message, method) {
     return query;
 }
 
-function newRequest(query, method) {
+function newRequest(query, responseProcessing = formRequest) {
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         request(query, function (err, res, body) {
             if (err) {
 
-                return resolve(err);
+                return reject(err);
             }
 
             return resolve(body);
         });
     })
-        .then((message) => formRequest(message, method));
+        .then((message) => responseProcessing(message));
 }
 
-function formRequest(requestMessage, method) {
-    if (method === 'get') {
-        let finishGet = '';
-        for (let index = 0; index < requestMessage.length - 1; index++) {
-            finishGet += `${formRequest(requestMessage[index], 'post')}\n\n`;
-        }
-        finishGet += formRequest(requestMessage[requestMessage.length - 1], 'post');
-
-        return finishGet;
-    }
+function formRequest(requestMessage) {
     let finish = '';
     if (requestMessage && requestMessage.from) {
         finish += `${red('FROM')}: ${requestMessage.from}\n`;
@@ -106,4 +98,14 @@ function formRequest(requestMessage, method) {
     }
 
     return finish;
+}
+
+function isGet(requestMessage) {
+    let finishGet = '';
+    for (let index = 0; index < requestMessage.length - 1; index++) {
+        finishGet += `${formRequest(requestMessage[index])}\n\n`;
+    }
+    finishGet += formRequest(requestMessage[requestMessage.length - 1]);
+
+    return finishGet;
 }

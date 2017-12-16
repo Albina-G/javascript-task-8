@@ -21,12 +21,16 @@ server.on('request', (req, res) => {
                     if (reqRead !== null) {
                         textMessage += reqRead;
                     }
-                });
-                req.on('end', () => {
-                    textMessage = JSON.parse(textMessage);
-                    textMessage = createAnswerPost(parseUrl.query, textMessage.text);
-                    res.end(JSON.stringify(textMessage));
-                });
+                })
+                    .on('end', () => {
+                        textMessage = JSON.parse(textMessage);
+                        if (textMessage.text === undefined || textMessage.text === '') {
+                            res.statusCode = 404;
+                            res.end();
+                        }
+                        textMessage = createAnswerPost(parseUrl.query, textMessage.text);
+                        res.end(JSON.stringify(textMessage));
+                    });
                 break;
             default:
                 res.statusCode = 404;
@@ -54,6 +58,7 @@ function createAnswerPost(query, text) {
 
 function createAnswerGet(query) {
     if (query.from === undefined && query.to === undefined) {
+
         return JSON.stringify(allMessages);
     }
 
