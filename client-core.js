@@ -2,48 +2,32 @@
 
 const request = require('request');
 const chalk = require('chalk');
+const minimist = require('minimist');
+
 const red = chalk.hex('#F00');
 const green = chalk.hex('#0F0');
 const url = 'http://localhost:8080/messages';
 
 module.exports.execute = execute;
-module.exports.isStar = true;
+module.exports.isStar = false;
 
 function execute() {
     // Внутри этой функции нужно получить и обработать аргументы командной строки
-    const args = process.argv;
-    switch (args[2].toLowerCase()) {
+    const args = minimist(process.argv.slice(2));
+    switch (args._[0].toLowerCase()) {
         case 'list': {
-            let message = parseMessage(args);
-            let answer = createQuery(message, 'GET');
+            let answer = createQuery(args, 'GET');
 
             return Promise.resolve(answer);
         }
         case 'send': {
-            let message = parseMessage(args);
-            let requestMessage = createQuery(message, 'POST');
+            let requestMessage = createQuery(args, 'POST');
 
             return Promise.resolve(requestMessage);
         }
         default:
             break;
     }
-}
-
-function parseMessage(args) {
-    let message = {};
-    for (let i = 3; i < args.length; i++) {
-        let arg = args[i].match(/[^-].*/);
-        if (arg[0].includes('=')) {
-            let splitArg = arg[0].split('=');
-            message[splitArg[0].toLowerCase()] = splitArg[1];
-        } else {
-            message[arg[0].toLowerCase()] = args[i + 1];
-            i++;
-        }
-    }
-
-    return message;
 }
 
 function createQuery(message, method) {
