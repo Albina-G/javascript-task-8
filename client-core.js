@@ -6,24 +6,40 @@ const minimist = require('minimist');
 
 const red = chalk.hex('#F00');
 const green = chalk.hex('#0F0');
+const grey = chalk.hex('#777');
+const yellow = chalk.hex('#FF0');
 const url = 'http://localhost:8080/messages';
 
 module.exports.execute = execute;
-module.exports.isStar = false;
+module.exports.isStar = true;
 
 function execute() {
     // Внутри этой функции нужно получить и обработать аргументы командной строки
     const args = minimist(process.argv.slice(2));
+    let formatMsg;
     switch (args._[0].toLowerCase()) {
         case 'list': {
             let answer = createQuery(args, 'GET');
+            formatMsg = answer.then(message => isGet(message, args.v));
 
-            return Promise.resolve(answer);
+            return Promise.resolve(formatMsg);
         }
         case 'send': {
             let requestMessage = createQuery(args, 'POST');
+            formatMsg = requestMessage.then(message => formatRequest(message, args.v));
 
-            return Promise.resolve(requestMessage);
+            return Promise.resolve(formatMsg);
+        }
+        case 'delete': {
+            let deleteMSG = deleteMessage(args);
+
+            return Promise.resolve(deleteMSG);
+        }
+        case 'edit': {
+            let editeMSG = editMessage(args);
+            formatMsg = editeMSG.then(message => formatRequest(message));
+
+            return Promise.resolve(formatMsg);
         }
         default:
             break;
@@ -41,11 +57,9 @@ function createQuery(message, method) {
     };
     if (method === 'POST') {
         query.body = { text: message.text };
-
-        return newRequest(query);
     }
 
-    return newRequest(query, isGet);
+    return newRequest(query);
 }
 
 function createUrl(message) {
@@ -66,7 +80,40 @@ function createUrl(message) {
     return urlQuery;
 }
 
-function newRequest(query, responseProcessing = formRequest) {
+function deleteMessage(args) {
+    if (!args.id) {
+        throw new Error('Отсутствует текст сообщения');
+    }
+    let urlQuery = `${url}/${args.id}`;
+    const query = {
+        method: 'DELETE',
+        url: urlQuery,
+        json: true
+    };
+
+    let answer = newRequest(query);
+    if (answer.status === 'ok') {
+
+        return 'DELETED';
+    }
+}
+
+function editMessage(args) {
+    if (!args.id || !args.text) {
+        throw new Error('Отсутствует текст сообщения');
+    }
+    let urlQuery = `${url}/${args.id}`;
+    const query = {
+        method: 'PATCH',
+        url: urlQuery,
+        json: true,
+        body: { text: args.text }
+    };
+
+    return newRequest(query);
+}
+
+function newRequest(query) {
 
     return new Promise((resolve, reject) => {
         request(query, function (err, res, body) {
@@ -77,12 +124,14 @@ function newRequest(query, responseProcessing = formRequest) {
 
             return resolve(body);
         });
-    })
-        .then((message) => responseProcessing(message));
+    });
 }
 
-function formRequest(requestMessage) {
+function formatRequest(requestMessage, key) {
     let finish = '';
+    if (requestMessage && requestMessage.id && key) {
+        finish += `${yellow('ID')}: ${requestMessage.id}\n`;
+    }
     if (requestMessage && requestMessage.from) {
         finish += `${red('FROM')}: ${requestMessage.from}\n`;
     }
@@ -92,16 +141,18 @@ function formRequest(requestMessage) {
     if (requestMessage && requestMessage.text) {
         finish += `${green('TEXT')}: ${requestMessage.text}`;
     }
+    if (requestMessage && requestMessage.edit) {
+        finish += grey('(edited)');
+    }
 
     return finish;
 }
 
-function isGet(requestMessage) {
-    let finishGet = '';
-    for (let index = 0; index < requestMessage.length - 1; index++) {
-        finishGet += `${formRequest(requestMessage[index])}\n\n`;
-    }
-    finishGet += formRequest(requestMessage[requestMessage.length - 1]);
+function isGet(requestMessage, key) {
 
-    return finishGet;
+    return requestMessage.map(message => {
+
+        return formatRequest(message, key);
+    })
+        .join('\n\n');
 }
