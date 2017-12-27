@@ -92,7 +92,7 @@ function createUrl(message) {
 }
 
 function deleteMessage(args) {
-    if (args.id) {
+    if (!args.id) {
 
         return;
     }
@@ -113,7 +113,7 @@ function deleteMessage(args) {
 }
 
 function editMessage(args) {
-    if (args.id || args.text) {
+    if (!args.id || !args.text) {
 
         return Promise.resolve(JSON.stringify({}));
     }
