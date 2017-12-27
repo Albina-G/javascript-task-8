@@ -82,7 +82,8 @@ function createUrl(message) {
 
 function deleteMessage(args) {
     if (!args.id) {
-        throw new Error('Отсутствует текст сообщения');
+        // throw new Error('Отсутствует текст сообщения');
+        return;
     }
     let urlQuery = `${url}/${args.id}`;
     const query = {
@@ -96,11 +97,14 @@ function deleteMessage(args) {
 
         return 'DELETED';
     }
+
+    return answer;
 }
 
 function editMessage(args) {
     if (!args.id || !args.text) {
-        throw new Error('Отсутствует текст сообщения');
+
+        return Promise.resolve(JSON.stringify({}));
     }
     let urlQuery = `${url}/${args.id}`;
     const query = {
@@ -129,19 +133,17 @@ function newRequest(query) {
 
 function formatRequest(requestMessage, key) {
     let finish = '';
-    if (requestMessage && requestMessage.id && key) {
+    if (key) {
         finish += `${yellow('ID')}: ${requestMessage.id}\n`;
     }
-    if (requestMessage && requestMessage.from) {
+    if (requestMessage.from) {
         finish += `${red('FROM')}: ${requestMessage.from}\n`;
     }
-    if (requestMessage && requestMessage.to) {
+    if (requestMessage.to) {
         finish += `${red('TO')}: ${requestMessage.to}\n`;
     }
-    if (requestMessage && requestMessage.text) {
-        finish += `${green('TEXT')}: ${requestMessage.text}`;
-    }
-    if (requestMessage && requestMessage.edit) {
+    finish += `${green('TEXT')}: ${requestMessage.text}`;
+    if (requestMessage.edited) {
         finish += grey('(edited)');
     }
 

@@ -89,34 +89,30 @@ function createAnswerDelete(parseUrl, res) {
     let id = parseUrl.pathname.split('/')[2];
     if (!id) {
         errorReturn(res);
-
-        return;
     }
     allMessages = allMessages.filter(message => {
 
         return message.id !== id;
     });
 
-    return JSON.stringify({ status: 'ok' });
+    return JSON.stringify({ 'status': 'ok' });
 }
 
 function findAndEditMessage(parseUrl, text, res) {
     let id = parseUrl.pathname.split('/')[2];
-    if (!id || !text || text === '') {
+    if (!id || !text) {
         errorReturn(res);
-
-        return;
     }
     let indexEditMsg;
     allMessages.forEach((message, index) => {
         if (message.id === id) {
             indexEditMsg = index;
             message.text = text;
-            message.edit = true;
+            message.edited = true;
         }
     });
 
-    return allMessages[indexEditMsg];
+    return allMessages[indexEditMsg] || {};
 }
 
 function readRequest(req) {
