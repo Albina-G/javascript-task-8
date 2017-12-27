@@ -15,7 +15,7 @@ module.exports.isStar = true;
 
 function execute() {
     // Внутри этой функции нужно получить и обработать аргументы командной строки
-    const args = minimist(process.argv.slice(2));
+    const args = parseArgs(minimist(process.argv.slice(2)));
     let formatMsg;
     switch (args._[0].toLowerCase()) {
         case 'list': {
@@ -44,6 +44,16 @@ function execute() {
         default:
             break;
     }
+}
+
+function parseArgs(argsProcess) {
+    let keys = Object.keys(argsProcess);
+    const args = {};
+    keys.forEach(key => {
+        args[key.toLowerCase()] = argsProcess[key];
+    });
+
+    return args;
 }
 
 function createQuery(message, method) {
