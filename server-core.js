@@ -35,7 +35,7 @@ function methodDefinition(res, req, parseUrl) {
             break;
         case 'POST':
             readRequest(req)
-                .then(textMessage => returnMessage(parseUrl, textMessage, res, addNewMessage));
+                .then(textMessage => returnMessage(parseUrl.query, textMessage, res, addNewMsg));
             break;
         case 'DELETE':
             res.end(createAnswerDelete(parseUrl, res));
@@ -50,7 +50,7 @@ function methodDefinition(res, req, parseUrl) {
     }
 }
 
-function addNewMessage(query, text, res) {
+function addNewMsg(query, text, res) {
     if (!text || text === '') {
         errorReturn(res);
     }
@@ -137,6 +137,6 @@ function readRequest(req) {
 
 function returnMessage(parseUrl, textMessage, res, funcCreateMsg) {
     textMessage = JSON.parse(textMessage);
-    textMessage = funcCreateMsg(parseUrl.query, textMessage.text, res);
+    textMessage = funcCreateMsg(parseUrl, textMessage.text, res);
     res.end(JSON.stringify(textMessage));
 }
