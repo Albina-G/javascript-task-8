@@ -48,7 +48,8 @@ function execute() {
 
 function createQuery(message, method) {
     if (!message.text && method === 'POST') {
-        throw new Error('Отсутствует текст сообщения');
+
+        return;
     }
     const query = {
         method: method,
@@ -81,7 +82,8 @@ function createUrl(message) {
 }
 
 function deleteMessage(args) {
-    if (!args.id) {
+    if (args.id) {
+
         return;
     }
     let urlQuery = `${url}/${args.id}`;
@@ -101,7 +103,7 @@ function deleteMessage(args) {
 }
 
 function editMessage(args) {
-    if (!args.id || !args.text) {
+    if (args.id || args.text) {
 
         return Promise.resolve(JSON.stringify({}));
     }
