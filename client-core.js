@@ -82,7 +82,6 @@ function createUrl(message) {
 
 function deleteMessage(args) {
     if (!args.id) {
-        // throw new Error('Отсутствует текст сообщения');
         return;
     }
     let urlQuery = `${url}/${args.id}`;

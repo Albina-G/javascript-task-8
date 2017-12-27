@@ -9,10 +9,7 @@ let allMessages = [];
 
 server.on('request', (req, res) => {
     let parseUrl = url.parse(req.url, true);
-    let reg1 = /^\/messages$/;
-    let reg2 = /^\/messages\/[\w-_]+$/;
-    let checkUrl = reg1.test(parseUrl.pathname) || reg2.test(parseUrl.pathname);
-    if (checkUrl) {
+    if (checkUrlMethod(parseUrl, req)) {
         res.setHeader('Content-Type', 'application/json');
         methodDefinition(res, req, parseUrl);
     } else {
@@ -21,6 +18,15 @@ server.on('request', (req, res) => {
 });
 
 module.exports = server;
+
+function checkUrlMethod(parseUrl, req) {
+    if (req.method === 'GET' || req.method === 'POST') {
+
+        return /^\/messages$/.test(parseUrl.pathname);
+    }
+
+    return /^\/messages\/[\w-_]+$/.test(parseUrl.pathname);
+}
 
 function methodDefinition(res, req, parseUrl) {
     switch (req.method) {
