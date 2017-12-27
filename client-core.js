@@ -103,13 +103,7 @@ function deleteMessage(args) {
         json: true
     };
 
-    let answer = newRequest(query);
-    if (answer.status === 'ok') {
-
-        return 'DELETED';
-    }
-
-    return answer;
+    return newRequest(query, 'delete');
 }
 
 function editMessage(args) {
@@ -128,13 +122,17 @@ function editMessage(args) {
     return newRequest(query);
 }
 
-function newRequest(query) {
+function newRequest(query, method = 'noDelete') {
 
     return new Promise((resolve, reject) => {
         request(query, function (err, res, body) {
             if (err) {
 
                 return reject(err);
+            }
+            if (body.status === 'ok' && method === 'delete') {
+
+                return resolve('DELETED');
             }
 
             return resolve(body);
