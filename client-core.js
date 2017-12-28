@@ -37,7 +37,7 @@ function execute() {
         }
         case 'edit': {
             let editeMSG = editMessage(args);
-            formatMsg = editeMSG.then(message => formatRequest(message));
+            formatMsg = editeMSG.then(message => formatRequest(message, args.v));
 
             return Promise.resolve(formatMsg);
         }
@@ -130,7 +130,7 @@ function newRequest(query, method = 'noDelete') {
 
                 return reject(err);
             }
-            if (body.status === 'ok' && method === 'delete') {
+            if (method === 'delete') {
 
                 return resolve('DELETED');
             }
