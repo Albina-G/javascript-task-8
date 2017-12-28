@@ -131,8 +131,12 @@ function newRequest(query, method = 'noDelete') {
                 return reject(err);
             }
             if (method === 'delete') {
+                if (body.status === 'ok') {
 
-                return resolve('DELETED');
+                    return resolve('DELETED');
+                }
+
+                return reject('Сообщение не удалилось');
             }
 
             return resolve(body);
