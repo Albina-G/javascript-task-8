@@ -92,10 +92,6 @@ function createUrl(message) {
 }
 
 function deleteMessage(args) {
-    if (!args.id) {
-
-        return;
-    }
     let urlQuery = `${url}/${args.id}`;
     const query = {
         method: 'DELETE',
@@ -107,7 +103,7 @@ function deleteMessage(args) {
 }
 
 function editMessage(args) {
-    if (!args.id || !args.text) {
+    if (!args.text) {
 
         return Promise.resolve(JSON.stringify({}));
     }
